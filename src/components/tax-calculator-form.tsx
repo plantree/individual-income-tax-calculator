@@ -21,7 +21,6 @@ import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
@@ -44,14 +43,16 @@ const formSchema = z.object({
   }),
   threshold: z.coerce.number().min(0, {
     message: '起征点不能为负数',
-  }).default(5000),
+  }),
   insurance: z.coerce.number().min(0, {
     message: '社保公积金不能为负数',
-  }).default(0),
+  }),
   specialDeduction: z.coerce.number().min(0, {
     message: '专项附加扣除不能为负数',
-  }).default(0),
+  }),
 });
+
+type FormData = z.infer<typeof formSchema>;
 
 type CalculationResult = {
   currentMonthTax: number;
@@ -69,7 +70,7 @@ export function TaxCalculatorForm() {
   const [result, setResult] = useState<CalculationResult>(null);
 
   // 初始化表单
-  const form = useForm<z.infer<typeof formSchema>>({
+  const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       totalIncome: 0,
@@ -83,7 +84,7 @@ export function TaxCalculatorForm() {
   });
 
   // 提交表单
-  function onSubmit(values: z.infer<typeof formSchema>) {
+  function onSubmit(values: FormData) {
     const calculationResult = calculateMonthlyTax(values);
     setResult(calculationResult);
   }
